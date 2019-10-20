@@ -7,6 +7,8 @@
 
 [Running the Ansible file in place (EC2 Server Environment) to stand up the website](https://github.com/alexcoward/Project0/wiki/Ansible-Playbook-Documentation#running-the-ansible-file-in-place-ec2-server-environment-to-stand-up-the-website)
 
+[Running the Terraform file in place (EC2 Server Environment) to stand up the infrastructure](https://github.com/alexcoward/Project0/wiki/Ansible-Playbook-Documentation#running-the-ansible-file-in-place-ec2-server-environment-to-stand-up-the-website)
+
 ## Contributing
 
 Issues, feature requests, ideas are appreciated and can be posted in the Issues section.
