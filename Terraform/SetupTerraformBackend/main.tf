@@ -5,14 +5,14 @@
 provider "aws" {
   version = "~> 2.33"
   region = "us-west-2"
-  shared_credentials_file = "/Users/kindra/.aws/credentials"
+  shared_credentials_file = "$HOME/.aws/credentials"
   profile = "default"
 } # end provider
 
 
 # create an s3 bucket
 resource "aws_s3_bucket" "tf-remote-state" {
-  bucket = "project1-rstate"
+  bucket = "your-bucket-name"
 
   versioning {
     enabled = true
@@ -26,7 +26,7 @@ resource "aws_s3_bucket" "tf-remote-state" {
 # create the dynamoDB table
 
 resource "aws_dynamodb_table" "dynamodb-tf-state-lock" {
-  name            = "project1-tfslock"
+  name            = "your-table-name"
   hash_key        = "LockID"
   read_capacity   = 20
   write_capacity = 20

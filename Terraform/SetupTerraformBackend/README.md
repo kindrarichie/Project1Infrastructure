@@ -16,9 +16,9 @@ Next, add the following to the top of the file:
     terraform {
     backend  "s3" {
     region         = "us-west-2"
-    bucket         = "project1-rstate"
+    bucket         = "your-bucket-name"
     key            = "terraform.tfstate"
-    dynamodb_table = "project1-tfslock"
+    dynamodb_table = "your-table-name"
      }
     }
     
