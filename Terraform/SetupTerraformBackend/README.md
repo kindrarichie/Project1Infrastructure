@@ -12,6 +12,7 @@ An AWS account along with the associated credentials.
 
 Create a directory with the main.tf file. Run terraform apply. This creates the bucket and lock.
 Next, add the following to the top of the file:
+
     terraform {
     backend  "s3" {
     region         = "us-west-2"
@@ -19,7 +20,8 @@ Next, add the following to the top of the file:
     key            = "terraform.tfstate"
     dynamodb_table = "project1-tfslock"
      }
-    } 
+    }
+    
 Run terraform apply to apply the changes.
 
 ## Contributing
