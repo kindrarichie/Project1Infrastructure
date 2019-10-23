@@ -12,7 +12,7 @@ provider "aws" {
 
 # create an s3 bucket
 resource "aws_s3_bucket" "tf-remote-state" {
-  bucket = "your-bucket-name"
+  bucket = "project1-terraform-backend-bucket"
 
   versioning {
     enabled = true
@@ -21,12 +21,17 @@ resource "aws_s3_bucket" "tf-remote-state" {
   lifecycle {
     prevent_destroy = true
   }
+  
+  tags = {
+    Name = "Project 1 S3 backend bucket"
+    Environment = "production"
+  }
 }
 
 # create the dynamoDB table
 
 resource "aws_dynamodb_table" "dynamodb-tf-state-lock" {
-  name            = "your-table-name"
+  name            = "project1-terraform-backend-table"
   hash_key        = "LockID"
   read_capacity   = 20
   write_capacity = 20
@@ -37,7 +42,8 @@ resource "aws_dynamodb_table" "dynamodb-tf-state-lock" {
   }
 
   tags = {
-    Name = "DynamoDB tf state locking"
+    Name = "Project 1 DynamoDB tf state locking"
+    Environment = "production"
   }
 } 
 
