@@ -37,7 +37,7 @@ resource "aws_iam_group_policy" "project1policy" {
     {
       "Effect": "Allow",
       "Action": "ec2-instance-connect:SendSSHPublicKey",
-      "Resource": "arn:aws:ec2:us-west-2:862576949950:instance/*",
+      "Resource": "arn:aws:ec2:us-west-2:${var.account_id}:instance/*",
       "Condition": {
         "StringEquals": {
           "ec2:osuser": "ubuntu"
