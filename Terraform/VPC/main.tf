@@ -6,6 +6,7 @@ terraform {
    bucket = "project1-terraform-backend-bucket"
    key    = "VPC/terraform.tfstate"
    dynamodb_table = "project1-terraform-backend-table"
+   encrypt = true
   }
 }
 
@@ -21,6 +22,7 @@ provider "aws" {
 resource "aws_vpc" "vpc" {
   cidr_block       = "${var.vpc_cidr}"
   instance_tenancy = "${var.vpc_tenancy}"
+  enable_dns_hostnames = "true"
   tags = {
     tag-key = "project-project1"
     Name = "vpc"
