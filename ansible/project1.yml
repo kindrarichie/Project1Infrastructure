@@ -1,0 +1,120 @@
+---
+
+- hosts: webservers
+  remote_user: ubuntu
+  become: yes
+  become_user: root
+  become_method: sudo
+
+  vars:
+     core_packages: ['software-properties-common', 'git' , 'unzip', 'openjdk-11-jdk', 'ec2-instance-connect', 'apache2']
+
+  tasks:
+
+  - name: Enable repository
+    apt_repository:
+      repo: "ppa:openjdk-r/ppa"
+      state: present
+
+  - name: upgrade dist
+    apt:
+      upgrade: 'yes'
+
+  - name: install core packages
+    apt:
+      name: "{{ core_packages }}"
+      update_cache: yes
+      state: present
+
+  - name: insert JAVA_HOME in .bashrc 
+    lineinfile:
+      path: /home/ubuntu/.bashrc
+      line: "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64"
+
+  - name: insert PATH in .bashrc
+    lineinfile:
+      path: /home/ubuntu/.bashrc
+      line: "export PATH=$PATH:$JAVA_HOME/bin"
+
+  - name: get artifactory .zip
+    shell: sudo curl -L "https://jfrog.bintray.com/artifactory/jfrog-artifactory-oss-6.13.1.zip" -o jfrog-artifactory-oss-6.13.1.zip
+    args:
+      chdir: /opt
+
+  - name: unzip artifactory .zip
+    shell: unzip jfrog-artifactory-oss-6.13.1.zip
+    args:
+      chdir: /opt
+      warn: no
+
+  - name: remove .zip
+    file:
+      path: /opt/jfrog-artifactory-oss-6.13.1.zip
+      state: absent
+
+  - name: install artifactory
+    shell: ./installService.sh
+    args:
+      chdir: /opt/artifactory-oss-6.13.1/bin
+
+  - name: clone project1 repo
+    git:
+      repo: https://github.com/alexcoward/Project1.git
+      dest: /home/Project1
+
+  - name: copy artifactory config files
+    command: cp /home/Project1/config/default /etc/opt/jfrog/artifactory/default
+
+  - name: copy apache config files
+    command: cp /home/Project1/config/000-default.conf /etc/apache2/sites-available/000-default.conf
+
+  - name: remove project1 repo
+    file:
+      path: /home/Project1
+      state: absent
+
+  - name: enable apache2 module rewrite workaround 
+    command: a2enmod rewrite
+
+  - name: enable apache2 module proxy_http workaround 
+    command: a2enmod proxy_http
+
+  - name: enable apache2 module proxy workaround 
+    command: a2enmod proxy
+
+  - name: enable apache2 module proxy_ajp workaround 
+    command: a2enmod proxy_ajp
+
+  - name: enable apache2 module deflate workaround 
+    command: a2enmod deflate
+
+  - name: enable apache2 module headers workaround 
+    command: a2enmod headers
+
+  - name: enable apache2 module proxy_balancer workaround 
+    command: a2enmod proxy_balancer
+
+  - name: enable apache2 module proxy_connect workaround 
+    command: a2enmod proxy_connect
+
+  - name: enable apache2 module proxy_html workaround 
+    command: a2enmod proxy_html
+
+  - name: enable apache2 module ssl workaround 
+    command: a2enmod ssl
+
+  - name: enable apache2 module lbmethod_byrequests workaround 
+    command: a2enmod lbmethod_byrequests
+
+  - name: enable apache2 module slotmem_shm workaround 
+    command: a2enmod slotmem_shm
+
+  - name: restart apache2
+    service:
+      name: apache2
+      state: restarted
+
+  - name: restart artifactory
+    service:
+      name: artifactory
+      state: restarted

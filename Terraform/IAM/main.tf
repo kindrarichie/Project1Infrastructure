@@ -28,6 +28,7 @@ resource "aws_iam_user" "admin_user" {
   
 }
 
+
 ### Creating admin User access keys
 resource "aws_iam_access_key" "admin_user" {
   user = "${aws_iam_user.admin_user.name}"
@@ -45,6 +46,7 @@ resource "aws_iam_user" "vpc_user" {
   }
   
 }
+
 
 ### Creating admin User access keys
 resource "aws_iam_access_key" "vpc_user" {
@@ -138,6 +140,7 @@ output "admin_user" {
   value = aws_iam_user.admin_user.name
 }
 
+
 output "secretadmin" {
   value = "${aws_iam_access_key.admin_user.encrypted_secret}"
 }
@@ -157,8 +160,6 @@ output "secretvpc" {
 output "vpc_user_access_id" {
   value = "${aws_iam_access_key.vpc_user.id}"
 }
-
-
 
 # create Lambda role start/stop
 resource "aws_iam_role" "lambdarole" {
