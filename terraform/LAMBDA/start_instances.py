@@ -1,25 +1,39 @@
 import boto3
+import logging
 
-# Boto Connection
-ec2 = boto3.resource('ec2', 'us-west-2')
+#setup simple logging for INFO
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+#define the connection
+ec2 = boto3.resource('ec2','us-west-2')
 
 def lambda_handler(event, context):
-  # Filters
-  filters = [{
-      'Name': 'tag:AutoStop',
-      'Values': ['true']
-    },
-    {
-      'Name': 'instance-state-name', 
-      'Values': ['stopped']
-    }
-  ]
+    # Use the filter() method of the instances collection to retrieve
+    # all running EC2 instances.
+    filters = [{
+            'Name': 'tag:AutoOnOff',
+            'Values': ['True']
+        },
+        {
+            'Name': 'instance-state-name', 
+            'Values': ['stopped']
+        }
+    ]
+    
+    #filter the instances
+    instances = ec2.instances.filter(Filters=filters)
 
-  # Filter stopped instances that should start
-  instances = ec2.instances.filter(Filters=filters)
-
-  # Retrieve instance IDs
-  instance_ids = [instance.id for instance in instances]
-
-  # starting instances
-  starting_instances = ec2.instances.filter(InstanceIds=instance_ids).start()
+    #locate all stopped instances
+    StoppedInstances = [instance.id for instance in instances]
+    
+    #print the instances for logging purposes
+    #print StoppedInstances 
+    
+    #make sure there are actually instances to start. 
+    if len(StoppedInstances) > 0:
+        #perform the startup
+        startingUp = ec2.instances.filter(InstanceIds=StoppedInstances).start()
+        print startingUp
+    else:
+        print "No Instances To Start!"

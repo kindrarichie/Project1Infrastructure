@@ -234,6 +234,7 @@ resource "aws_instance" "nat" {
 
   tags = {
     Name = "Project1 NAT"
+    AutoOnOff = "False"
   }
   user_data = <<EOF
   #! /bin/bash
