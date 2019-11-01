@@ -84,9 +84,6 @@ resource "aws_iam_policy" "project1lambdapolicy" {
     {
       "Effect": "Allow",
       "Action": [
-        "ec2:CreateNetworkInterface",
-        "ec2:AttachNetworkInterface",
-        "ec2:DeleteNetworkInterface",
         "ec2:Describe*",
         "ec2:Start*",
         "ec2:Stop*"
@@ -128,11 +125,6 @@ handler = "start_instances.lambda_handler"
 runtime = "python2.7"
 timeout = 300
 source_code_hash = "${filebase64sha256("./start_instances.zip")}"
-#vpc_config {
-#    subnet_ids         = [data.terraform_remote_state.vpc.outputs.subnet-pub1, data.terraform_remote_state.vpc.outputs.subnet-pub2, #data.terraform_remote_state.vpc.outputs.subnet-pub3, data.terraform_remote_state.vpc.outputs.subnet-pvt1, #data.terraform_remote_state.vpc.outputs.subnet-pvt2, data.terraform_remote_state.vpc.outputs.subnet-pvt3]
-#
-#    security_group_ids = [data.terraform_remote_state.ec2.outputs.webserver-sg-id, #data.terraform_remote_state.ec2.outputs.bastion-sg-id]
-#  }
 }
 
 resource "aws_lambda_function" "ec2_stop_scheduler_lambda" {
@@ -143,11 +135,6 @@ handler = "stop_instances.lambda_handler"
 runtime = "python2.7"
 timeout = 300
 source_code_hash = "${filebase64sha256("./stop_instances.zip")}"
-#vpc_config {
-#    subnet_ids         = [data.terraform_remote_state.vpc.outputs.subnet-pub1, data.terraform_remote_state.vpc.outputs.subnet-pub2, #data.terraform_remote_state.vpc.outputs.subnet-pub3, data.terraform_remote_state.vpc.outputs.subnet-pvt1, #data.terraform_remote_state.vpc.outputs.subnet-pvt2, data.terraform_remote_state.vpc.outputs.subnet-pvt3]
-#
-#    security_group_ids = [data.terraform_remote_state.ec2.outputs.webserver-sg-id, #data.terraform_remote_state.ec2.outputs.bastion-sg-id]
-#  }
 }
 
 ### Cloudwatch Events ###

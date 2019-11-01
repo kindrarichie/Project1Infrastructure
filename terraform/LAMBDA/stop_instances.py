@@ -1,25 +1,39 @@
 import boto3
+import logging
 
-# Boto Connection
-ec2 = boto3.resource('ec2', 'us-west-2')
+#setup simple logging for INFO
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+#define the connection
+ec2 = boto3.resource('ec2','us-west-2')
 
 def lambda_handler(event, context):
-  # Filters
-  filters = [{
-      'Name': 'tag:AutoStop',
-      'Values': ['true']
-    },
-    {
-      'Name': 'instance-state-name', 
-      'Values': ['running']
-    }
-  ]
+    # Use the filter() method of the instances collection to retrieve
+    # all running EC2 instances.
+    filters = [{
+            'Name': 'tag:AutoOnOff',
+            'Values': ['True']
+        },
+        {
+            'Name': 'instance-state-name', 
+            'Values': ['running']
+        }
+    ]
+    
+    #filter the instances
+    instances = ec2.instances.filter(Filters=filters)
 
-  # Filter running instances that should stop
-  instances = ec2.instances.filter(Filters=filters)
-
-  # Retrieve instance IDs
-  instance_ids = [instance.id for instance in instances]
-
-  # stopping instances
-  stopping_instances = ec2.instances.filter(InstanceIds=instance_ids).stop()
+    #locate all running instances
+    RunningInstances = [instance.id for instance in instances]
+    
+    #print the instances for logging purposes
+    #print RunningInstances 
+    
+    #make sure there are actually instances to shut down. 
+    if len(RunningInstances) > 0:
+        #perform the shutdown
+        shuttingDown = ec2.instances.filter(InstanceIds=RunningInstances).stop()
+        print shuttingDown
+    else:
+        print "No Instances To Stop!"

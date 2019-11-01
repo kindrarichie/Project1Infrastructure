@@ -138,6 +138,7 @@ EOF
   tags = {
     Name = "Bastion_Host"
     tag-key = "project-project1"
+    AutoOnOff = "True"
   }
 
   root_block_device {
@@ -167,6 +168,7 @@ resource "aws_instance" "Webserver1" {
   tags = {
     Name = "Webserver1"
     tag-key = "project-project1"
+    AutoOnOff = "True"
   }
   user_data = <<EOF
 #! /bin/bash
@@ -197,6 +199,7 @@ resource "aws_instance" "Webserver2" {
   tags = {
     Name = "Webserver2"
     tag-key = "project-project1"
+    AutoOnOff = "True"
   }
   user_data = <<EOF
 #! /bin/bash
