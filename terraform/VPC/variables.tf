@@ -1,10 +1,3 @@
-#variable "giver" {
-#  type = map(string)
-#  default = {
-#    profile = "republic"
-#  }
-#}
-
 # AWS region
 
 variable "region" {
