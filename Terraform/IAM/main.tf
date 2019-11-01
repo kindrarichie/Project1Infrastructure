@@ -6,6 +6,7 @@ terraform {
    bucket = "project1-terraform-backend-bucket"
    key    = "IAM/terraform.tfstate"
    dynamodb_table = "project1-terraform-backend-table"
+   encrypt = true
   }
 }
 
@@ -22,8 +23,16 @@ resource "aws_iam_user" "admin_user" {
   
   tags = {
     tag-key = "project-project1"
+    Name = "admin_user"
   }
   
+}
+
+
+### Creating admin User access keys
+resource "aws_iam_access_key" "admin_user" {
+  user = "${aws_iam_user.admin_user.name}"
+  pgp_key = "keybase:kindrarichie"
 }
 
 ### Creating vpc User
@@ -33,8 +42,16 @@ resource "aws_iam_user" "vpc_user" {
   
   tags = {
     tag-key = "project-project1"
+    Name = "vpc_user"
   }
   
+}
+
+
+### Creating admin User access keys
+resource "aws_iam_access_key" "vpc_user" {
+  user = "${aws_iam_user.vpc_user.name}"
+  pgp_key = "keybase:kindrarichie"
 }
 
 ### Creating admin access to admin User
@@ -123,10 +140,26 @@ output "admin_user" {
   value = aws_iam_user.admin_user.name
 }
 
+
+output "secretadmin" {
+  value = "${aws_iam_access_key.admin_user.encrypted_secret}"
+}
+
+output "admin_user_access_id" {
+  value = "${aws_iam_access_key.admin_user.id}"
+}
+
 output "vpc_user" {
   value = aws_iam_user.vpc_user.name
 }
 
+output "secretvpc" {
+  value = "${aws_iam_access_key.vpc_user.encrypted_secret}"
+}
+
+output "vpc_user_access_id" {
+  value = "${aws_iam_access_key.vpc_user.id}"
+}
 
 # create Lambda role start/stop
 resource "aws_iam_role" "lambdarole" {

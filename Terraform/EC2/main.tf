@@ -69,7 +69,7 @@ resource "aws_iam_policy" "instance_connect" {
   		"Action": "ec2-instance-connect:SendSSHPublicKey",
   		"Resource": "*",
   		"Condition": {
-  			"StringEquals": { "ec2:osuser": "ec2-user" }
+  			"StringEquals": { "ec2:osuser": "ubuntu" }
   		}
   	},
 		{
