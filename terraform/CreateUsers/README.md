@@ -1,28 +1,35 @@
-# Project1Infrastructure
+# Project1 IAM
 
-This file will establish and configure remote state. The Project 1 Terraform remote backend uses AWS Simple Storage Service (S3). 
-S3 will allow you to track state over time without worrying about one person overwriting the work of another.
-It also uses AWS DynamoDB to lock changes from happening from multiple people at the same time. 
+These Terraform files will configure IAM in a new AWS account setup enabling management of access to AWS services and resources securely. 
+
+This establishes the following in IAM:
+
+- Two users
+- One group, project1, that the two users belong to
+- One managed policy granting users permission for EC2 Instance Connect applied to the project1 group
+
+The output consists of the usernames of the two users.
+
 
 ## Dependencies
 
-An AWS account along with the associated credentials. 
+An AWS account along with the associated credentials and an S3 backend resource. 
 
 ## Installation
 
-Create a directory with the main.tf file. Run terraform apply. This creates the bucket and lock.
-Next, add the following to the top of the file:
+Run terraform plan and then apply. Change the usernames in variable.tf to your preferred users. Optionally, create a new directory for all three files. 
 
-    terraform {
-    backend  "s3" {
-    region         = "us-west-2"
-    bucket         = "your-bucket-name"
-    key            = "terraform.tfstate"
-    dynamodb_table = "your-table-name"
-     }
-    }
-    
-Run terraform apply to apply the changes.
+## Inputs
+
+| Name | Description | Type |
+|------|-------------|:----:|
+| username | Names of users | string |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| username | Names of users |
 
 ## Contributing
 
