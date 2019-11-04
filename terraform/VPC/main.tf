@@ -1,12 +1,12 @@
 #VPC Bucket Creation
 
 terraform {
-   backend "s3" {
-   region = "us-west-2"
-   bucket = "project1-terraform-backend-bucket"
-   key    = "VPC/terraform.tfstate"
-   dynamodb_table = "project1-terraform-backend-table"
-   encrypt = true
+  backend "s3" {
+  region = "us-west-2"
+  bucket = "project1-terraform-backend-bucket-alex"
+  key    = "VPC/terraform.tfstate"
+  dynamodb_table = "project1-terraform-backend-table"
+  encrypt = true
   }
 }
 
@@ -118,6 +118,7 @@ resource "aws_subnet" "private_subnet3" {
 }
 
 ## Routetable creation for public subnet
+
 resource "aws_route_table" "PublicSubnetRouteTable" {
   vpc_id = "${aws_vpc.vpc.id}"
   route {
@@ -131,26 +132,28 @@ resource "aws_route_table" "PublicSubnetRouteTable" {
 }
 
 ## Route table association for public subnet 1
+
 resource "aws_route_table_association" "mapping_subnet_to_rt" {
   subnet_id      = "${aws_subnet.public_subnet.id}"
   route_table_id = "${aws_route_table.PublicSubnetRouteTable.id}"
 }
 
 ## Route table association for public subnet 2
+
 resource "aws_route_table_association" "mapping_subnet_to_rt2" {
   subnet_id      = "${aws_subnet.public_subnet2.id}"
   route_table_id = "${aws_route_table.PublicSubnetRouteTable.id}"
 }
 
 ## Route table association for public subnet 2
+
 resource "aws_route_table_association" "mapping_subnet_to_rt3" {
   subnet_id      = "${aws_subnet.public_subnet3.id}"
   route_table_id = "${aws_route_table.PublicSubnetRouteTable.id}"
 }
 
-/*
-  NAT Instance SG
-*/
+## NAT Instance SG
+
 resource "aws_security_group" "nat" {
   name        = "vpc_nat"
   description = "Allow traffic to pass from the private subnet to the internet"
@@ -161,18 +164,21 @@ resource "aws_security_group" "nat" {
     protocol    = "tcp"
     cidr_blocks = ["${var.vpc_cidr}"]
   }
+
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["${var.vpc_cidr}"]
   }
+
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   ingress {
     from_port   = -1
     to_port     = -1
@@ -186,18 +192,21 @@ resource "aws_security_group" "nat" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   egress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   egress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["${var.vpc_cidr}"]
   }
+
   egress {
     from_port   = -1
     to_port     = -1
@@ -209,11 +218,10 @@ resource "aws_security_group" "nat" {
   tags = {
     Name = "NAT_SG"
   }
-
 }
-/*
-  NAT Instance
-*/
+
+##  NAT Instance
+
 resource "aws_instance" "nat" {
   ami                         = "ami-0541ea7d" # this is a special ami preconfigured to do NAT
   availability_zone           = "us-west-2a"
@@ -225,12 +233,17 @@ resource "aws_instance" "nat" {
   source_dest_check           = false
 
   tags = {
-    Name = "NAT"
+    Name = "Project1 NAT"
+    AutoOnOff = "False"
   }
+  user_data = <<EOF
+  #! /bin/bash
+  sudo yum -y update
+  EOF
 }
-/*
-  NAT Instance EIP
-*/
+
+##  NAT Instance EIP
+
 resource "aws_eip" "nat" {
   instance = "${aws_instance.nat.id}"
   vpc      = true
@@ -270,53 +283,4 @@ resource "aws_route_table_association" "mapping_subnet_to_pr_rtC" {
   subnet_id      = "${aws_subnet.private_subnet3.id}"
   route_table_id = "${aws_route_table.PrivateSubnetARouteTable.id}"
 
-}
-
-
-## Output of vpc , subnets and CIDRs
-
-
-output "subnet-pvt1" {
-  value = aws_subnet.private_subnet.id
-}
-output "subnet-pvt2" {
-  value = aws_subnet.private_subnet2.id
-}
-output "subnet-pvt3" {
-  value = aws_subnet.private_subnet3.id
-}
-
-output "subnet-pub1" {
-  value = aws_subnet.public_subnet.id
-}
-output "subnet-pub2" {
-  value = aws_subnet.public_subnet2.id
-}
-output "subnet-pub3" {
-  value = aws_subnet.public_subnet3.id
-}
-output "vpc-id" {
-  value = aws_vpc.vpc.id
-}
-
-output "vpc-cidr" {
-  value = "${var.vpc_cidr}"
-}
-output "public-subnet-1-cidr" {
-  value = "${var.p_subnet_cidr}"
-}
-output "public-subnet-2-cidr" {
-  value = "${var.p_subnet_cidr2}"
-}
-output "public-subnet-3-cidr" {
-  value = "${var.p_subnet_cidr3}"
-}
-output "private-subnet-1-cidr" {
-  value = "${var.pr_subnet_cidr}"
-}
-output "private-subnet-2-cidr" {
-  value = "${var.pr_subnet_cidr2}"
-}
-output "private-subnet-3-cidr" {
-  value = "${var.pr_subnet_cidr3}"
 }

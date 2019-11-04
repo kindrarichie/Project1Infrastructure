@@ -12,7 +12,7 @@ provider "aws" {
 
 # create an s3 bucket
 resource "aws_s3_bucket" "tf-remote-state" {
-  bucket = "project1-terraform-backend-bucket"
+  bucket = "project1-terraform-backend-bucket-alex"
 
   versioning {
     enabled = true

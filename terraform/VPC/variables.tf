@@ -1,12 +1,5 @@
-variable "giver" {
-  type = map(string)
-  default = {
-    profile = "republic"
-
-  }
-}
-
 # AWS region
+
 variable "region" {
   type        = "string"
   description = "Region of launching EC2"
@@ -14,13 +7,14 @@ variable "region" {
 }
 
 #AWS VPC CIDR Range
+
 variable "vpc_cidr" {
   type        = "string"
   description = "CIDR Block for VPC"
   default     = "172.31.0.0/16"
 }
 
-# vpc Tenancyeancy has been set to default
+# vpc Tenancy has been set to default
 
 variable "vpc_tenancy" {
   type        = "string"
@@ -51,6 +45,7 @@ variable "p_subnet_cidr" {
 }
 
 ## Public Subnet 1 Availability zone
+
 variable "p_subnet_az" {
   type        = "string"
   description = "AZ for first Public Subnet"
@@ -106,6 +101,7 @@ variable "p_subnet_az3" {
 }
 
 #AWS Private Subnet 1 CIDR range
+
 variable "pr_subnet_cidr" {
   type        = "string"
   description = "CIDR for first Private subnet"
@@ -163,23 +159,26 @@ variable "pr_subnet_az3" {
   default     = "us-west-2c"
 }
 
+# AWS Public Route Table
 
-#AWS Public Route Table
 variable "public_route_table_tags" {
   type        = "string"
   description = "Tag name for Public Route Table"
   default     = "PublicSubnetARouteTable"
 }
 
-#AWS Private Route Table
+# AWS Private Route Table
+
 variable "private_route_table_tags" {
   type        = "string"
   description = "Tag name for Private Route Table"
   default     = "PrivateSubnetARouteTable"
 }
 
+# Key that exists in AWS Account
+
 variable "aws_key_name" {
   type        = "string"
   description = "Key Pair"
-  default     = "take2"
+  default     = "testing"
 }

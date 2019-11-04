@@ -1,11 +1,22 @@
 #EC2 Bucket Creation
 
 terraform {
-   backend "s3" {
-   region = "us-west-2"
-   bucket = "project1-terraform-backend-bucket"
-   key    = "EC2/terraform.tfstate"
-   dynamodb_table = "project1-terraform-backend-table"
+  backend "s3" {
+  region = "us-west-2"
+  bucket = "project1-terraform-backend-bucket-alex"
+  key    = "EC2/terraform.tfstate"
+  dynamodb_table = "project1-terraform-backend-table"
+  }
+}
+
+# data from remote state bucket VPC/terraform.tfstate
+data "terraform_remote_state" "vpc" {
+  backend = "s3"
+
+  config = {
+        bucket = "project1-terraform-backend-bucket-alex"
+        key    = "VPC/terraform.tfstate"
+        region  = "us-west-2"
   }
 }
 
@@ -14,78 +25,6 @@ provider "aws" {
   region = "us-west-2"
   shared_credentials_file = "$HOME/.aws/credentials"
   profile = "default"
-}
-
-/*
-#IAM_Role
-*/
-resource "aws_iam_role" "instance_connect" {
-  name        = "instance-connect"
-  description = "privileges for the instance-connect demonstration"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": ["ec2.amazonaws.com", "ssm.amazonaws.com" ]
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-/*
-#IAM Role Attachment
-*/
-resource "aws_iam_role_policy_attachment" "instance_connect" {
-  role       = "${aws_iam_role.instance_connect.id}"
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
-}
-/*
-#IAM Instance Profile
-*/
-resource "aws_iam_instance_profile" "instance_connect" {
-  name = "instance-connect"
-  role = "${aws_iam_role.instance_connect.id}"
-}
-/*
-#IAM policy
-*/
-resource "aws_iam_policy" "instance_connect" {
-  name        = "instance-connect"
-  path        = "/test/"
-  description = "Allows use of EC2 instance connect"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-  		"Effect": "Allow",
-  		"Action": "ec2-instance-connect:SendSSHPublicKey",
-  		"Resource": "*",
-  		"Condition": {
-  			"StringEquals": { "ec2:osuser": "ubuntu" }
-  		}
-  	},
-		{
-			"Effect": "Allow",
-			"Action": "ec2:DescribeInstances",
-			"Resource": "*"
-		}
-  ]
-}
-EOF
-}
-
-resource "aws_iam_policy_attachment" "instance_connect" {
-  name       = "instance-connect"
-  users      = [data.terraform_remote_state.iam.outputs.admin_user, data.terraform_remote_state.iam.outputs.vpc_user]
-  policy_arn = "${aws_iam_policy.instance_connect.arn}"
 }
 
 /*
@@ -99,20 +38,23 @@ resource "aws_security_group" "server_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc-cidr, "0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
+
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc-cidr, "0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
+
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc-cidr, "0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
+
   ingress {
     from_port   = -1
     to_port     = -1
@@ -121,36 +63,18 @@ resource "aws_security_group" "server_sg" {
   }
 
   egress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc-cidr]
-  }
-  egress {
-    from_port   = -1
-    to_port     = -1
-    protocol    = "icmp"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   vpc_id = data.terraform_remote_state.vpc.outputs.vpc-id
+
   tags = {
     Name = "main_SG"
     tag-key = "project-project1"
   }
-
 }
 
 /*
@@ -164,50 +88,65 @@ resource "aws_security_group" "bastion" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${var.cidr_blocks_whitelist}"]
+    cidr_blocks = ["${var.cidr_blocks_whitelist1}"]
   }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.cidr_blocks_whitelist2}"]
+  }
+
   egress {
-    from_port   = -1
-    to_port     = -1
-    protocol    = "icmp"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   vpc_id = data.terraform_remote_state.vpc.outputs.vpc-id
+
   tags = {
     Name = "bastion_sg"
     tag-key = "project-project1"
   }
-
 }
 
 /*
 #Bastion Host instance
 */
-
 resource "aws_instance" "Bastion_Host" {
   ami                    = "${var.AMIID}"
   instance_type          = "t2.micro"
-  key_name               = "${var.Key_pair}"
+  key_name               = "${var.aws_key_name}"
   subnet_id              = data.terraform_remote_state.vpc.outputs.subnet-pub1
   vpc_security_group_ids = ["${aws_security_group.bastion.id}"]
-  iam_instance_profile   = "${aws_iam_instance_profile.instance_connect.name}"
   user_data              = <<EOF
 #! /bin/bash
 sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-add-repository ppa:ansible/ansible -y
+sudo apt-get update
+sudo apt-get install -y ansible
 sudo apt-get install -y ec2-instance-connect
+sudo apt-get install -y awscli
+sudo apt-get install -y build-essential libssl-dev libffi-dev python3-dev
+sudo apt-get install -y python3-pip
+pip3 install ec2instanceconnectcli
 EOF
   tags = {
     Name = "Bastion_Host"
     tag-key = "project-project1"
+    AutoOnOff = "True"
   }
-
 
   root_block_device {
     volume_type = "gp2"
     volume_size = "30"
   }
 }
+
 /*
   Bastion_Host Instance EIP
 */
@@ -215,24 +154,26 @@ resource "aws_eip" "Bastion_Host_eip" {
   instance = "${aws_instance.Bastion_Host.id}"
   vpc      = true
 }
+
 /*
 #Web Server 1 instance
 */
-
 resource "aws_instance" "Webserver1" {
   ami                    = "${var.AMIID}"
-  instance_type          = "t2.micro"
-  key_name               = "${var.Key_pair}"
+  instance_type          = "t2.large"
+  key_name               = "${var.aws_key_name}"
   subnet_id              = data.terraform_remote_state.vpc.outputs.subnet-pvt2
   vpc_security_group_ids = ["${aws_security_group.server_sg.id}"]
-  iam_instance_profile   = "${aws_iam_instance_profile.instance_connect.name}"
+
   tags = {
     Name = "Webserver1"
     tag-key = "project-project1"
+    AutoOnOff = "True"
   }
   user_data = <<EOF
 #! /bin/bash
 sudo apt-get update
+sudo apt-get upgrade -y
 sudo apt-get install -y ec2-instance-connect
 sudo apt-get install -y apache2
 sudo systemctl start apache2
@@ -244,19 +185,21 @@ EOF
     volume_size = "30"
   }
 }
+
 /*
 #Web Server 2 instance
 */
 resource "aws_instance" "Webserver2" {
   ami                    = "${var.AMIID}"
-  instance_type          = "t2.micro"
-  key_name               = "${var.Key_pair}"
+  instance_type          = "t2.large"
+  key_name               = "${var.aws_key_name}"
   subnet_id              = data.terraform_remote_state.vpc.outputs.subnet-pvt3
   vpc_security_group_ids = ["${aws_security_group.server_sg.id}"]
-  iam_instance_profile   = "${aws_iam_instance_profile.instance_connect.name}"
+
   tags = {
     Name = "Webserver2"
     tag-key = "project-project1"
+    AutoOnOff = "True"
   }
   user_data = <<EOF
 #! /bin/bash
@@ -273,11 +216,9 @@ EOF
   }
 }
 
-
 /*
 #Web Server application elb
 */
-
 resource "aws_alb" "web_elb" {
   name                       = "web-alb"
   internal                   = false
@@ -304,6 +245,11 @@ resource "aws_alb_target_group" "alb_ws_tgrp" {
     timeout             = 4
     matcher             = "200"
   }
+  stickiness {
+    type = "lb_cookie"
+    # Set cookie duration to one hour (3600s)
+    cookie_duration = 3600
+  }
 }
 
 /*
@@ -323,6 +269,7 @@ resource "aws_alb_target_group_attachment" "alb_ws-02_http" {
   target_id        = "${aws_instance.Webserver2.id}"
   port             = 80
 }
+
 /*
 #Web Server listener for port 80 to 443
 */
@@ -341,6 +288,7 @@ resource "aws_alb_listener" "ws_listener_http" {
     }
   }
 }
+
 /*
 #Web Server listerner for port 443
 */
@@ -358,7 +306,7 @@ resource "aws_alb_listener" "ws_alb_https" {
 }
 
 /*
-#Route 53 for www.teamface.xyz
+#Route 53 for www.teamaerial.gq
 */
 data "aws_route53_zone" "primary" {
   name = "${var.domain}"
@@ -367,6 +315,18 @@ data "aws_route53_zone" "primary" {
 resource "aws_route53_record" "www" {
   zone_id = "${data.aws_route53_zone.primary.zone_id}"
   name    = "www"
+  type    = "A"
+
+  alias {
+    name                   = "${aws_alb.web_elb.dns_name}"
+    zone_id                = "${aws_alb.web_elb.zone_id}"
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "tld" {
+  zone_id = "${data.aws_route53_zone.primary.zone_id}"
+  name    = ""
   type    = "A"
 
   alias {
