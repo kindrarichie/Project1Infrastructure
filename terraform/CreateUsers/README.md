@@ -17,7 +17,7 @@ An AWS account along with the associated credentials and an S3 backend resource.
 
 ## Installation
 
-Run terraform plan and then apply. Change the usernames in variable.tf to your preferred users. Optionally, create a new directory for all three files. 
+Change the usernames in variable.tf to your preferred users. Run terraform plan and then apply. Optionally, create a new directory for all three files. 
 
 ## Inputs
 
