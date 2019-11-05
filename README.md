@@ -1,17 +1,33 @@
 # Project1
 
-This Terraform configuration will provision the following infrastructure and services in an AWS account:
+These files complete the following:
 
+Terraform
 - Locking Remote State
 - IAM 
 - VPC 
 - EC2
 - LAMBDA function to start/stop EC2 instances
 
+Ansible
+- Web server setup and configuration
+- Web application Artifactory deployment
+
+
+
+
 
 ## Dependencies
 
-An AWS account along with the associated credentials
+Terraform installed locally. 
+
+Ansible installed in place (EC2 bastion)
+
+## Installation
+
+[Running the Terraform files to stand up the infrastructure](https://github.com/alexcoward/Project1/wiki/Terraform-Documentation)
+
+[Running the Ansible file in place (EC2 Server Environment) to stand up the web application](https://github.com/alexcoward/Project1/wiki/Ansible-Playbook-Documentation)
 
 ## Contributing
 
