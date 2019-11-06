@@ -1,13 +1,14 @@
 ---
 
-- hosts: webservers
+- name: set up webservers
+  hosts: webservers
   remote_user: ubuntu
   become: yes
   become_user: root
   become_method: sudo
 
   vars:
-     core_packages: ['software-properties-common', 'git' , 'unzip', 'openjdk-11-jdk', 'ec2-instance-connect', 'apache2']
+     server_packages: ['software-properties-common', 'git' , 'unzip', 'openjdk-11-jdk', 'ec2-instance-connect', 'apache2']
 
   tasks:
 
@@ -22,7 +23,7 @@
 
   - name: install core packages
     apt:
-      name: "{{ core_packages }}"
+      name: "{{ server_packages }}"
       update_cache: yes
       state: present
 
@@ -118,3 +119,33 @@
     service:
       name: artifactory
       state: restarted
+
+- name: set up bastion server
+  hosts: bastion
+  connection: local
+  become: yes
+  become_user: root
+  become_method: sudo
+
+  vars:
+     bastion_packages: ['fail2ban', 'sendmail' , 'python-apt']
+
+  tasks:
+
+  - name: upgrade dist
+    apt:
+      upgrade: 'yes'
+  
+  - name: install apt fail2ban packages
+    apt: 
+      name: "{{ bastion_packages }}"   
+      update_cache: yes
+      state: present
+  
+  - name: override the basic fail2ban configuration with .local file
+    copy:
+      src: /home/ubuntu/Project1Infrastructure/ansible/jail.local
+      dest: /etc/fail2ban/jail.local
+      owner: root
+      group: root
+      mode: 0644
