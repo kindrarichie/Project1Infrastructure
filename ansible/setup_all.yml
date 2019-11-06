@@ -1,6 +1,7 @@
 ---
 
-- hosts: webservers
+- name: set up webservers
+  hosts: webservers
   remote_user: ubuntu
   become: yes
   become_user: root
@@ -118,3 +119,30 @@
     service:
       name: artifactory
       state: restarted
+
+- name: set up bastion server
+  hosts: bastion
+  connection: local
+  become: yes
+  become_user: root
+  become_method: sudo
+
+  tasks:
+  
+  - name: install apt fail2ban packages
+    apt: 
+      name: "{{ item }}"   
+      state: latest
+      update_cache: yes
+      cache_valid_time: 3600
+    with_items:
+      - fail2ban
+      - sendmail
+  
+  - name: override the basic fail2ban configuration with .local file
+    copy:
+      src: /home/ubuntu/Project1Infrastructure/ansible/jail.local
+      dest: /etc/fail2ban/jail.local
+      owner: root
+      group: root
+      mode: 0644
