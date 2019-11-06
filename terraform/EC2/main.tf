@@ -119,7 +119,7 @@ resource "aws_security_group" "bastion" {
 resource "aws_instance" "Bastion_Host" {
   ami                    = "${var.AMIID}"
   instance_type          = "t2.micro"
-  key_name               = "${var.aws_key_name}"
+  /*key_name               = "${var.aws_key_name}"*/
   subnet_id              = data.terraform_remote_state.vpc.outputs.subnet-pub1
   vpc_security_group_ids = ["${aws_security_group.bastion.id}"]
   user_data              = <<EOF
@@ -161,7 +161,7 @@ resource "aws_eip" "Bastion_Host_eip" {
 resource "aws_instance" "Webserver1" {
   ami                    = "${var.AMIID}"
   instance_type          = "t2.large"
-  key_name               = "${var.aws_key_name}"
+  /*key_name               = "${var.aws_key_name}"*/
   subnet_id              = data.terraform_remote_state.vpc.outputs.subnet-pvt2
   vpc_security_group_ids = ["${aws_security_group.server_sg.id}"]
 
@@ -192,7 +192,7 @@ EOF
 resource "aws_instance" "Webserver2" {
   ami                    = "${var.AMIID}"
   instance_type          = "t2.large"
-  key_name               = "${var.aws_key_name}"
+  /*key_name               = "${var.aws_key_name}"*/
   subnet_id              = data.terraform_remote_state.vpc.outputs.subnet-pvt3
   vpc_security_group_ids = ["${aws_security_group.server_sg.id}"]
 
