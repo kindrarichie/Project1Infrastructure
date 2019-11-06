@@ -23,7 +23,8 @@ DEFAULT_SECRET_KEY=""
 aws configure set aws_access_key_id "$DEFAULT_ACCESS_KEY"
 aws configure set aws_secret_access_key "$DEFAULT_SECRET_KEY"
 aws configure set default.region "us-west-2"
-#export ANSIBLE_HOST_KEY_CHECKING=False
+#disable host key checking
+export ANSIBLE_HOST_KEY_CHECKING=False
 #clone repo
 git clone https://github.com/alexcoward/Project1Infrastructure.git
 #generate rsa keypair
@@ -32,7 +33,7 @@ yes y |ssh-keygen -q -t rsa -f my_rsa_key -N '' >/dev/null
 aws ec2-instance-connect send-ssh-public-key --region us-west-2 --instance-id "$ID1" --instance-os-user ubuntu \
 --availability-zone "$AZ1" --ssh-public-key file://my_rsa_key.pub && aws ec2-instance-connect send-ssh-public-key \
 --region us-west-2 --instance-id "$ID2" --instance-os-user ubuntu --availability-zone "$AZ2" --ssh-public-key file://my_rsa_key.pub \
-&& ansible-playbook /home/ubuntu/Project1Infrastructure/ansible/setup_all.yml
+&& ansible-playbook -i /home/ubuntu/Project1Infrastructure/ansible/hosts /home/ubuntu/Project1Infrastructure/ansible/setup_all.yml
 #cleanup
 rm -rf Project1Infrastructure/
 rm -f my_rsa_key
