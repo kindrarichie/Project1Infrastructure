@@ -1,17 +1,14 @@
 # Project1
 
-This Terraform configuration will provision the following infrastructure and services in an AWS account:
-
-- Locking Remote State
-- IAM 
-- VPC 
-- EC2
-- LAMBDA function to start/stop EC2 instances
-
+This Ansible role will install fail2ban on an instance.
 
 ## Dependencies
 
-An AWS account along with the associated credentials
+Ansible >= 2.0
+
+## Run
+
+After cloning the repo and changing directory create an inventory file with the target host. In the jail.local file update the destemail, sender, and sendername. Run the playbook on localhost: $ ansible-playbook fail2ban-plyabook.yml
 
 ## Contributing
 

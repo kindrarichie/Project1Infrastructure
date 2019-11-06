@@ -1,13 +1,33 @@
 # Project1
 
+These files complete the following:
+
+Terraform
+- Locking Remote State
+- IAM 
+- VPC 
+- EC2
+- LAMBDA function to start/stop EC2 instances
+
+Ansible
+- Web server setup and configuration
+- Web application Artifactory deployment
+
+
+
+
+
 ## Dependencies
 
+Terraform installed locally. 
+
+Ansible installed in place (EC2 bastion)
 
 ## Installation
 
-[Running the Ansible file in place (EC2 Server Environment) to stand up the website](https://github.com/alexcoward/Project0/wiki/Ansible-Playbook-Documentation#running-the-ansible-file-in-place-ec2-server-environment-to-stand-up-the-website)
+[Running the Terraform files to stand up the infrastructure](https://github.com/alexcoward/Project1/wiki/Terraform-Documentation)
 
-[Running the Terraform file in place (EC2 Server Environment) to stand up the infrastructure](https://github.com/alexcoward/Project0/wiki/Ansible-Playbook-Documentation#running-the-ansible-file-in-place-ec2-server-environment-to-stand-up-the-website)
+[Running the Ansible file in place (EC2 Server Environment) to stand up the web application](https://github.com/alexcoward/Project1/wiki/Ansible-Playbook-Documentation)
 
 ## Contributing
 

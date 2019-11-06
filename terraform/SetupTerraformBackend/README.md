@@ -1,4 +1,4 @@
-# Project1Infrastructure
+# Project1 Locking Remote State
 
 This file will establish and configure remote state. The Project 1 Terraform remote backend uses AWS Simple Storage Service (S3). 
 S3 will allow you to track state over time without worrying about one person overwriting the work of another.
@@ -6,11 +6,12 @@ It also uses AWS DynamoDB to lock changes from happening from multiple people at
 
 ## Dependencies
 
-An AWS account along with the associated credentials. 
+An AWS account along with the associated credentials. Permissions in AWS allowing AmazonS3FullAccess and AmazonDynamoDBFullAccess.
+Terraform installed locally.
 
 ## Installation
 
-Create a directory with the main.tf file. Run terraform apply. This creates the bucket and lock.
+If not cloning the repo, create a directory with the main.tf file. Run terraform apply. This creates the bucket and lock.
 Next, add the following to the top of the file:
 
     terraform {
