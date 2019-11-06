@@ -1,6 +1,6 @@
 # Project1 IAM
 
-These Terraform files will configure IAM in a new AWS account setup enabling management of access to AWS services and resources securely. 
+These Terraform files will configure IAM in an AWS account enabling management of access to AWS services and resources securely. 
 
 This establishes the following in IAM:
 
@@ -8,22 +8,21 @@ This establishes the following in IAM:
 - One group, project1, that the two users belong to
 - One managed policy granting users permission for EC2 Instance Connect applied to the project1 group
 
-The output consists of the usernames of the two users.
-
-
 ## Dependencies
 
-An AWS account along with the associated credentials and an S3 backend resource. 
+An AWS account along with the associated credentials and an [S3 backend resource](https://github.com/alexcoward/Project1Infrastructure/tree/master/terraform/SetupTerraformBackend). 
+Permissions in AWS allowing IAMFullAccess and AmazonS3FullAccess.
+Terraform installed locally.
 
 ## Installation
 
-Change the usernames in variable.tf to your preferred users. Run terraform plan and then apply. Optionally, create a new directory for all three files. 
+Change the usernames in variable.tf to your preferred users. Run terraform plan and then apply. Optionally, first create a new directory for all three files depending on the file layout your prefer. If creating a new directory, be sure to change the key for the backend resource. 
 
 ## Inputs
 
 | Name | Description | Type |
 |------|-------------|:----:|
-| username | Names of users | string |
+| username | Names of users | list |
 
 ## Outputs
 
