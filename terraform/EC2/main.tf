@@ -223,7 +223,7 @@ resource "aws_alb" "web_elb" {
   name                       = "web-alb"
   internal                   = false
   security_groups            = ["${aws_security_group.server_sg.id}"]
-  subnets                    = [data.terraform_remote_state.vpc.outputs.subnet-pub1, data.terraform_remote_state.vpc.outputs.subnet-pub2, data.terraform_remote_state.vpc.outputs.subnet-pub3]
+  subnets                    = [data.terraform_remote_state.vpc.outputs.subnet-pub2, data.terraform_remote_state.vpc.outputs.subnet-pub3]
   enable_deletion_protection = false
 }
 

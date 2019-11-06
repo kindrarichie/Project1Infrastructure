@@ -1,28 +1,47 @@
-# Project1Infrastructure
+# Project1 EC2
 
-This file will establish and configure remote state. The Project 1 Terraform remote backend uses AWS Simple Storage Service (S3). 
-S3 will allow you to track state over time without worrying about one person overwriting the work of another.
-It also uses AWS DynamoDB to lock changes from happening from multiple people at the same time. 
+These Terraform files will provision EC2 infrastructure in an AWS account.  
+
+This establishes the following:
+
+- One bastion of jump instance in Public subnet 1 associated with the bastion instance security group. It allows inbound ssh traffic from Team Aerial's members and from CSUN. It allows ssh, dns, http, and https traffic out
+- Two EC2 web server type t2.micro instances. Web server 1 is located in Private subnet 2. Web server 2 is located in Private subnet 3. They are associated with the server security group. It allows inbound http, https, ssh, and icmp traffic. All traffic is allowed for egress
+- One application load balancer (ALB) with session stickiness. It is associated with the server security group. The ALB functions in the Public Subnets of availability zones a and b. The targets are web servers 1 and 2
+- Two Elastic IP addresses. One associated with the NAT instance and one associated with the bastion of jump instance
+- AWS Route 53 service
+- AWS Certificate Manager (ACM) service
 
 ## Dependencies
 
-An AWS account along with the associated credentials. 
+An AWS account along with the associated credentials and an [S3 backend resource](https://github.com/alexcoward/Project1Infrastructure/tree/master/terraform/SetupTerraformBackend). 
+Terraform installed locally. 
+[The provisioned VPC](https://github.com/alexcoward/Project1Infrastructure/tree/master/terraform/VPC). 
 
 ## Installation
 
-Create a directory with the main.tf file. Run terraform apply. This creates the bucket and lock.
-Next, add the following to the top of the file:
+Replace the variable defaults with your preferred setup. Run terraform plan and then apply. Optionally, first create a new directory for all three files depending on the file layout your prefer. If creating a new directory, be sure to change the key for the backend resource. 
 
-    terraform {
-    backend  "s3" {
-    region         = "us-west-2"
-    bucket         = "your-bucket-name"
-    key            = "terraform.tfstate"
-    dynamodb_table = "your-table-name"
-     }
-    }
-    
-Run terraform apply to apply the changes.
+## Inputs
+
+| Name | Description | Type |
+|------|-------------|:----:|
+| region | Region of launch | string |
+| AMIID | Amazon machine image | string |
+| ssl_certificate_id | ACM ssl certificate id | string |
+| domain | website domain | string |
+| cidr_blocks_whitelist1 | IP addresses to whitelist | string |
+| cidr_blocks_whitelist2 | IP addresses to whitelist | string |
+| aws_key_name | key pair | string |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| bastion-instance-id | bastion id |
+| webserver1-instance-id | webserver1 id |
+| webserver2-instance-id | webserver2 id |
+| webserver-sg-id | server sg id |
+| bastion-sg-id | bastion sg id |
 
 ## Contributing
 
