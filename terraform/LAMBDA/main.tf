@@ -27,7 +27,7 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
-# data from remote state bucket VPC/terraform.tfstate
+# data from remote state bucket EC2/terraform.tfstate
 data "terraform_remote_state" "ec2" {
   backend = "s3"
 

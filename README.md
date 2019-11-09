@@ -12,6 +12,7 @@ Terraform
 Ansible
 - Web server setup and configuration
 - Web application Artifactory deployment
+- Bastion instance fail2ban install
 
 
 
