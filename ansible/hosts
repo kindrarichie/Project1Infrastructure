@@ -1,7 +1,7 @@
 # EC2 Webservers hosting artifactory
 [webservers]
-server1 ansible_host=172.31.167.210 ansible_ssh_private_key_file=/home/ubuntu/my_rsa_key ansible_ssh_user=ubuntu
-server2 ansible_host=172.31.215.211 ansible_ssh_private_key_file=/home/ubuntu/my_rsa_key ansible_ssh_user=ubuntu
+server1 ansible_host=172.31.183.86 ansible_ssh_private_key_file=/home/ubuntu/my_rsa_key ansible_ssh_user=ubuntu
+server2 ansible_host=172.31.197.27 ansible_ssh_private_key_file=/home/ubuntu/my_rsa_key ansible_ssh_user=ubuntu
 
 # Load balancer
 [loadbalancer]
